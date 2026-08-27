@@ -1,0 +1,7 @@
+{
+  "name": "Clip Vault",
+  "description": "Private memory, made light. A warm, calm, tactile clipboard management application.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
