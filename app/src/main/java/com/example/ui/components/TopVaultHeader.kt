@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ fun TopVaultHeader(
     clips: List<ClipEntity>,
     filteredCount: Int,
     onAddNewClip: () -> Unit,
+    onOpenOnboarding: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val totalCount = clips.size
@@ -67,7 +69,7 @@ fun TopVaultHeader(
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp)
     ) {
-        // App Title & Add (+) Button Row
+        // App Title & Action Buttons Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -122,22 +124,48 @@ fun TopVaultHeader(
                 )
             }
 
-            // Add (+) Button
-            Surface(
-                onClick = onAddNewClip,
-                shape = RoundedCornerShape(13.dp),
-                color = vc.accentPrimary,
-                modifier = Modifier
-                    .size(44.dp)
-                    .testTag("top_add_clip_button")
+            // Right Actions: Guide Button + Add (+) Button
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add Clip",
-                        tint = vc.accentOnPrimary,
-                        modifier = Modifier.size(24.dp)
-                    )
+                if (onOpenOnboarding != null) {
+                    Surface(
+                        onClick = onOpenOnboarding,
+                        shape = RoundedCornerShape(13.dp),
+                        color = vc.accentSecondary,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .testTag("top_guide_button")
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Outlined.Lightbulb,
+                                contentDescription = "App Tour & Guide",
+                                tint = vc.accentSecondaryText,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                    }
+                }
+
+                // Add (+) Button
+                Surface(
+                    onClick = onAddNewClip,
+                    shape = RoundedCornerShape(13.dp),
+                    color = vc.accentPrimary,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .testTag("top_add_clip_button")
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Clip",
+                            tint = vc.accentOnPrimary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }

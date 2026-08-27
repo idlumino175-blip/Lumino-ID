@@ -53,6 +53,11 @@ class ClipVaultViewModel(private val repository: ClipRepository) : ViewModel() {
     private val _feedbackMessage = MutableStateFlow<String?>(null)
     val feedbackMessage: StateFlow<String?> = _feedbackMessage.asStateFlow()
 
+    private val _showOnboarding = MutableStateFlow(false)
+    val showOnboarding: StateFlow<Boolean> = _showOnboarding.asStateFlow()
+
+    private var hasCheckedOnboarding = false
+
     val allClips: StateFlow<List<ClipEntity>> = repository.allClips
         .stateIn(
             scope = viewModelScope,
@@ -147,6 +152,25 @@ class ClipVaultViewModel(private val repository: ClipRepository) : ViewModel() {
 
     fun clearFeedbackMessage() {
         _feedbackMessage.value = null
+    }
+
+    fun checkOnboarding(context: Context) {
+        if (!hasCheckedOnboarding) {
+            hasCheckedOnboarding = true
+            val prefs = context.getSharedPreferences("clips_vault_prefs", Context.MODE_PRIVATE)
+            val isCompleted = prefs.getBoolean("onboarding_completed", false)
+            _showOnboarding.value = !isCompleted
+        }
+    }
+
+    fun completeOnboarding(context: Context) {
+        val prefs = context.getSharedPreferences("clips_vault_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("onboarding_completed", true).apply()
+        _showOnboarding.value = false
+    }
+
+    fun openOnboarding() {
+        _showOnboarding.value = true
     }
 
     fun checkClipboard(context: Context) {
@@ -254,7 +278,7 @@ class ClipVaultViewModel(private val repository: ClipRepository) : ViewModel() {
             if (_detailClip.value?.id == clip.id) {
                 _detailClip.value = _detailClip.value?.copy(isPinned = newPinned)
             }
-            _feedbackMessage.value = if (newPinned) "Added to Favorites" else "Removed from Favorites"
+            _feedbackMessage.value = if (newPinned) "📌 Pinned to top (Important)" else "Unpinned from top"
         }
     }
 

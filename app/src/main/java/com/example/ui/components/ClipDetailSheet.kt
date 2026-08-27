@@ -22,9 +22,9 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -140,11 +140,13 @@ fun ClipDetailSheet(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = onTogglePin,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier
+                            .size(36.dp)
+                            .testTag("detail_pin_button")
                     ) {
                         Icon(
-                            imageVector = if (clip.isPinned) Icons.Default.Star else Icons.Outlined.StarOutline,
-                            contentDescription = "Pin",
+                            imageVector = if (clip.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                            contentDescription = if (clip.isPinned) "Unpin from Top" else "Pin to Top (Important)",
                             tint = if (clip.isPinned) vc.pinnedStar else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -294,6 +296,7 @@ fun ClipDetailSheet(
                     modifier = Modifier.padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    MetaStatRow("Priority", if (clip.isPinned) "📌 Pinned to Top (Important)" else "Standard")
                     MetaStatRow("Created", createdDateStr)
                     MetaStatRow("Character Count", "${clip.characterCount} characters")
                     MetaStatRow("Word Count", "${clip.wordCount} words")

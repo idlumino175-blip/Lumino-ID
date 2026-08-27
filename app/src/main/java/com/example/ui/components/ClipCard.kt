@@ -24,8 +24,10 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -128,14 +130,16 @@ fun ClipCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Category Dot and Label
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                // Category Dot and Label + Pinned Badge
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
                     Surface(
                         shape = CircleShape,
                         color = inkColor,
                         modifier = Modifier.size(7.dp)
                     ) {}
-                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = clip.categoryEnum.badgeLabel,
                         style = MaterialTheme.typography.labelSmall,
@@ -144,9 +148,38 @@ fun ClipCard(
                         color = inkColor,
                         fontSize = 12.sp
                     )
+
+                    if (clip.isPinned) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = vc.pinnedStar.copy(alpha = 0.18f),
+                            border = BorderStroke(1.dp, vc.pinnedStar.copy(alpha = 0.45f)),
+                            modifier = Modifier.height(20.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.PushPin,
+                                    contentDescription = null,
+                                    tint = vc.pinnedStar,
+                                    modifier = Modifier.size(11.dp)
+                                )
+                                Text(
+                                    text = "PINNED",
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    letterSpacing = 0.5.sp,
+                                    color = vc.pinnedStar
+                                )
+                            }
+                        }
+                    }
                 }
 
-                // Actions: Bookmark + 3-dots
+                // Actions: Pin to top toggle + 3-dots
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = onTogglePin,
@@ -155,8 +188,8 @@ fun ClipCard(
                             .testTag("pin_button_${clip.id}")
                     ) {
                         Icon(
-                            imageVector = if (clip.isPinned) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                            contentDescription = if (clip.isPinned) "Favorited" else "Favorite",
+                            imageVector = if (clip.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                            contentDescription = if (clip.isPinned) "Unpin from top" else "Pin to top (Important)",
                             tint = if (clip.isPinned) vc.pinnedStar else inkColor.copy(alpha = 0.75f),
                             modifier = Modifier.size(19.dp)
                         )
@@ -181,6 +214,22 @@ fun ClipCard(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
                         ) {
+                            DropdownMenuItem(
+                                text = { Text(if (clip.isPinned) "Unpin from Top" else "Pin to Top (Important)") },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (clip.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                                        contentDescription = null,
+                                        tint = if (clip.isPinned) vc.pinnedStar else MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                },
+                                onClick = {
+                                    showMenu = false
+                                    onTogglePin()
+                                }
+                            )
+
                             DropdownMenuItem(
                                 text = { Text("Edit Clip") },
                                 leadingIcon = {

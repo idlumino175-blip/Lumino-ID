@@ -90,9 +90,15 @@ fun ClipVaultScreen(
     val editingClip by viewModel.editClip.collectAsStateWithLifecycle()
     val detailClip by viewModel.detailClip.collectAsStateWithLifecycle()
     val feedbackMessage by viewModel.feedbackMessage.collectAsStateWithLifecycle()
+    val showOnboarding by viewModel.showOnboarding.collectAsStateWithLifecycle()
 
     val addSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val detailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Check onboarding status on launch
+    LaunchedEffect(Unit) {
+        viewModel.checkOnboarding(context)
+    }
 
     // Check system clipboard on app launch and resume
     DisposableEffect(lifecycleOwner) {
@@ -113,6 +119,13 @@ fun ClipVaultScreen(
             snackbarHostState.showSnackbar(msg)
             viewModel.clearFeedbackMessage()
         }
+    }
+
+    if (showOnboarding) {
+        OnboardingScreen(
+            onFinish = { viewModel.completeOnboarding(context) }
+        )
+        return
     }
 
     Scaffold(
@@ -147,7 +160,8 @@ fun ClipVaultScreen(
                 onSelectFilter = { viewModel.setSelectedFilter(it) },
                 clips = allClips,
                 filteredCount = filteredClips.size,
-                onAddNewClip = { viewModel.openAddSheet() }
+                onAddNewClip = { viewModel.openAddSheet() },
+                onOpenOnboarding = { viewModel.openOnboarding() }
             )
 
             // Smart Clipboard Banner (if new un-saved clip detected)
@@ -185,6 +199,7 @@ fun ClipVaultScreen(
                             viewModel.openAddSheet()
                         }
                     },
+                    onOpenTour = { viewModel.openOnboarding() },
                     modifier = Modifier.weight(1f)
                 )
             } else {
@@ -220,7 +235,8 @@ fun ClipVaultScreen(
                             },
                             onShare = { viewModel.shareClip(context, clip) },
                             onOpenUrl = { url -> viewModel.openUrl(context, url) },
-                            onClick = { viewModel.openDetailSheet(clip) }
+                            onClick = { viewModel.openDetailSheet(clip) },
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }

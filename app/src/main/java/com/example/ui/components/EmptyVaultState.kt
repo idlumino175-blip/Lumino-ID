@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -50,6 +51,7 @@ fun EmptyVaultState(
     onClearSearch: () -> Unit = {},
     onAddClip: () -> Unit,
     onPasteClip: () -> Unit,
+    onOpenTour: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val vc = VaultTheme.colors
@@ -220,6 +222,13 @@ fun EmptyVaultState(
                     label = "Save Link",
                     onClick = onAddClip
                 )
+                if (onOpenTour != null) {
+                    SuggestionPill(
+                        icon = Icons.Outlined.Lightbulb,
+                        label = "Tour",
+                        onClick = onOpenTour
+                    )
+                }
             }
         }
     }
