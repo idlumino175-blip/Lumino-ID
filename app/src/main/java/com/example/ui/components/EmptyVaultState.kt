@@ -35,13 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.theme.VaultTheme
 
 @Composable
 fun EmptyVaultState(
@@ -52,9 +52,7 @@ fun EmptyVaultState(
     onPasteClip: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = MaterialTheme.colorScheme.background.red < 0.2f
-    val navyColor = if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B)
-    val buttonTextColor = if (isDark) Color(0xFF172233) else Color.White
+    val vc = VaultTheme.colors
 
     Column(
         modifier = modifier
@@ -66,14 +64,14 @@ fun EmptyVaultState(
         if (isSearching) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
-                color = if (isDark) Color(0xFF213B50) else Color(0xFFEEE9DF),
+                color = vc.accentSecondary,
                 modifier = Modifier.size(80.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.SearchOff,
                         contentDescription = null,
-                        tint = if (isDark) Color(0xFFC5CBD0) else Color(0xFF7A8B99),
+                        tint = vc.mutedText,
                         modifier = Modifier.size(36.dp)
                     )
                 }
@@ -95,7 +93,7 @@ fun EmptyVaultState(
             Text(
                 text = "Check your spelling or reset active filters to find what you're looking for.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isDark) Color(0xFFC5CBD0) else Color(0xFF7A8B99),
+                color = vc.mutedText,
                 textAlign = TextAlign.Center,
                 lineHeight = 21.sp
             )
@@ -106,8 +104,8 @@ fun EmptyVaultState(
                 onClick = onClearSearch,
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = navyColor,
-                    contentColor = buttonTextColor
+                    containerColor = vc.accentPrimary,
+                    contentColor = vc.accentOnPrimary
                 ),
                 modifier = Modifier.height(44.dp).testTag("clear_search_empty_button")
             ) {
@@ -143,7 +141,7 @@ fun EmptyVaultState(
             Text(
                 text = "Save links, notes, or code snippets to keep your favorite thoughts organized and ready to reuse.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isDark) Color(0xFFC5CBD0) else Color(0xFF5E7285),
+                color = vc.subtleText,
                 textAlign = TextAlign.Center,
                 lineHeight = 22.sp,
                 modifier = Modifier.padding(horizontal = 8.dp)
@@ -156,8 +154,8 @@ fun EmptyVaultState(
                 onClick = onPasteClip,
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = navyColor,
-                    contentColor = buttonTextColor
+                    containerColor = vc.accentPrimary,
+                    contentColor = vc.accentOnPrimary
                 ),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
                 modifier = Modifier
@@ -184,7 +182,7 @@ fun EmptyVaultState(
             OutlinedButton(
                 onClick = onAddClip,
                 shape = RoundedCornerShape(18.dp),
-                border = BorderStroke(1.5.dp, if (isDark) Color(0xFF385269) else Color(0xFFD6CFC4)),
+                border = BorderStroke(1.5.dp, vc.cardBorder),
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
                     .height(46.dp)
@@ -234,12 +232,12 @@ private fun SuggestionPill(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = MaterialTheme.colorScheme.background.red < 0.2f
+    val vc = VaultTheme.colors
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
-        color = if (isDark) Color(0xFF213B50) else Color.White,
-        border = BorderStroke(1.dp, if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)),
+        color = vc.cardSurface,
+        border = BorderStroke(1.dp, vc.cardBorder),
         modifier = modifier.height(34.dp)
     ) {
         Row(
@@ -249,7 +247,7 @@ private fun SuggestionPill(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B),
+                tint = vc.accentPrimary,
                 modifier = Modifier.size(14.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
@@ -262,4 +260,3 @@ private fun SuggestionPill(
         }
     }
 }
-

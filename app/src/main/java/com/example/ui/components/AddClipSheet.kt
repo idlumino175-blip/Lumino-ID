@@ -2,6 +2,7 @@ package com.example.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.ClipCategory
 import com.example.model.ClipEntity
+import com.example.ui.theme.VaultTheme
 
 /**
  * Add / Edit Clip Sheet meeting Section 5.7 specifications:
@@ -74,7 +76,8 @@ fun AddClipSheet(
     }
 
     val finalCategory = manualCategory ?: autoDetectedCategory
-    val isDark = MaterialTheme.colorScheme.background.red < 0.2f
+    val isDarkTheme = isSystemInDarkTheme()
+    val vc = VaultTheme.colors
 
     LaunchedEffect(editingClip) {
         if (editingClip != null) {
@@ -95,7 +98,7 @@ fun AddClipSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = if (isDark) Color(0xFF213B50) else Color(0xFFFAF7F2),
+        containerColor = vc.sheetBackground,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(
@@ -158,7 +161,7 @@ fun AddClipSheet(
                         }
                     },
                     shape = RoundedCornerShape(8.dp),
-                    color = if (isDark) Color(0xFF2F4658) else Color(0xFFEEE9DF),
+                    color = vc.accentSecondary,
                     modifier = Modifier.height(28.dp)
                 ) {
                     Row(
@@ -168,14 +171,14 @@ fun AddClipSheet(
                         Icon(
                             imageVector = Icons.Default.ContentPaste,
                             contentDescription = null,
-                            tint = if (isDark) Color(0xFFF8F6F1) else Color(0xFF42546A),
+                            tint = vc.accentSecondaryText,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Paste clipboard",
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (isDark) Color(0xFFF8F6F1) else Color(0xFF42546A),
+                            color = vc.accentSecondaryText,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -200,10 +203,10 @@ fun AddClipSheet(
                 },
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = if (isDark) Color(0xFF172233) else Color.White,
-                    unfocusedContainerColor = if (isDark) Color(0xFF172233) else Color.White,
+                    focusedContainerColor = vc.inputBackground,
+                    unfocusedContainerColor = vc.inputBackground,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)
+                    unfocusedBorderColor = vc.inputBorder
                 )
             )
 
@@ -235,10 +238,10 @@ fun AddClipSheet(
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = if (isDark) Color(0xFF172233) else Color.White,
-                    unfocusedContainerColor = if (isDark) Color(0xFF172233) else Color.White,
+                    focusedContainerColor = vc.inputBackground,
+                    unfocusedContainerColor = vc.inputBackground,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)
+                    unfocusedBorderColor = vc.inputBorder
                 )
             )
 
@@ -284,26 +287,22 @@ fun AddClipSheet(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                ClipCategory.values().forEach { cat ->
+                ClipCategory.entries.forEach { cat ->
                     val isSelected = finalCategory == cat
                     Surface(
                         onClick = { manualCategory = cat },
                         shape = RoundedCornerShape(12.dp),
                         color = if (isSelected) {
-                            cat.bgLight
-                        } else if (isDark) {
-                            Color(0xFF172233)
+                            if (isDarkTheme) cat.bgDark else cat.bgLight
                         } else {
-                            Color(0xFFEEE9DF)
+                            vc.inputBackground
                         },
                         border = BorderStroke(
                             1.dp,
                             if (isSelected) {
-                                if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B)
-                            } else if (isDark) {
-                                Color(0xFF385269)
+                                vc.accentPrimary
                             } else {
-                                Color(0xFFE5DFD4)
+                                vc.inputBorder
                             }
                         ),
                         modifier = Modifier.height(34.dp)
@@ -315,14 +314,14 @@ fun AddClipSheet(
                             Icon(
                                 imageVector = cat.icon,
                                 contentDescription = null,
-                                tint = if (isSelected) cat.textLight else MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = if (isSelected) { if (isDarkTheme) cat.textDark else cat.textLight } else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(13.dp)
                             )
                             Spacer(modifier = Modifier.width(5.dp))
                             Text(
                                 text = cat.displayName,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = if (isSelected) cat.textLight else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (isSelected) { if (isDarkTheme) cat.textDark else cat.textLight } else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                             )
                         }
@@ -332,11 +331,44 @@ fun AddClipSheet(
 
             Spacer(modifier = Modifier.height(14.dp))
 
+            // Tags Input
+            Text(
+                text = "Tags",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            OutlinedTextField(
+                value = tags,
+                onValueChange = { tags = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = {
+                    Text(
+                        "e.g. Work, Personal, Project-X",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = vc.inputBackground,
+                    unfocusedContainerColor = vc.inputBackground,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = vc.inputBorder
+                )
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
             // Pin to top toggle
             Surface(
                 shape = RoundedCornerShape(14.dp),
-                color = if (isDark) Color(0xFF172233) else Color.White,
-                border = BorderStroke(1.dp, if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)),
+                color = vc.inputBackground,
+                border = BorderStroke(1.dp, vc.inputBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -350,7 +382,7 @@ fun AddClipSheet(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            tint = if (isPinned) Color(0xFFF5B700) else MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = if (isPinned) vc.pinnedStar else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -367,7 +399,7 @@ fun AddClipSheet(
                         onCheckedChange = { isPinned = it },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
-                            checkedTrackColor = if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B)
+                            checkedTrackColor = vc.accentPrimary
                         )
                     )
                 }
@@ -385,8 +417,8 @@ fun AddClipSheet(
                 enabled = content.isNotBlank(),
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B),
-                    contentColor = if (isDark) Color(0xFF172233) else Color.White
+                    containerColor = vc.accentPrimary,
+                    contentColor = vc.accentOnPrimary
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

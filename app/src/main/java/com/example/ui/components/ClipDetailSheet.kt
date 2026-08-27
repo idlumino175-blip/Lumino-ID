@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.ClipCategory
 import com.example.model.ClipEntity
+import com.example.ui.theme.VaultTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +71,7 @@ fun ClipDetailSheet(
     if (clip == null) return
 
     var showDeleteConfirm by remember { mutableStateOf(false) }
-    val isDark = MaterialTheme.colorScheme.background.red < 0.2f
+    val vc = VaultTheme.colors
 
     val createdDateStr = remember(clip.createdAt) {
         DateFormat.format("MMM dd, yyyy • h:mm a", clip.createdAt).toString()
@@ -88,7 +89,7 @@ fun ClipDetailSheet(
                         onDelete()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isDark) Color(0xFFE17A70) else Color(0xFFC95C51)
+                        containerColor = vc.destructive
                     )
                 ) {
                     Text("Delete", color = Color.White)
@@ -105,7 +106,7 @@ fun ClipDetailSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = if (isDark) Color(0xFF213B50) else Color(0xFFFAF7F2),
+        containerColor = vc.sheetBackground,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(
@@ -144,7 +145,7 @@ fun ClipDetailSheet(
                         Icon(
                             imageVector = if (clip.isPinned) Icons.Default.Star else Icons.Outlined.StarOutline,
                             contentDescription = "Pin",
-                            tint = if (clip.isPinned) Color(0xFFF5B700) else MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = if (clip.isPinned) vc.pinnedStar else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     IconButton(
@@ -165,8 +166,8 @@ fun ClipDetailSheet(
             // Full Content Box
             Surface(
                 shape = RoundedCornerShape(16.dp),
-                color = if (isDark) Color(0xFF172233) else Color.White,
-                border = BorderStroke(1.dp, if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)),
+                color = vc.inputBackground,
+                border = BorderStroke(1.dp, vc.inputBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -193,8 +194,8 @@ fun ClipDetailSheet(
                 onClick = onCopy,
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B),
-                    contentColor = if (isDark) Color(0xFF172233) else Color.White
+                    containerColor = vc.accentPrimary,
+                    contentColor = vc.accentOnPrimary
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -257,11 +258,11 @@ fun ClipDetailSheet(
                     onClick = { showDeleteConfirm = true },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = if (isDark) Color(0xFFE17A70) else Color(0xFFC95C51)
+                        contentColor = vc.destructive
                     ),
                     border = BorderStroke(
                         1.dp,
-                        (if (isDark) Color(0xFFE17A70) else Color(0xFFC95C51)).copy(alpha = 0.5f)
+                        vc.destructive.copy(alpha = 0.5f)
                     ),
                     modifier = Modifier.weight(1f).height(42.dp)
                 ) {
@@ -285,8 +286,8 @@ fun ClipDetailSheet(
 
             Surface(
                 shape = RoundedCornerShape(16.dp),
-                color = if (isDark) Color(0xFF172233) else Color.White,
-                border = BorderStroke(1.dp, if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)),
+                color = vc.inputBackground,
+                border = BorderStroke(1.dp, vc.inputBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(

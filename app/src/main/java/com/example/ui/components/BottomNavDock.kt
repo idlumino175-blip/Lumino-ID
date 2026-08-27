@@ -1,5 +1,7 @@
 package com.example.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.theme.VaultTheme
 
 enum class VaultNavTab {
     HOME,
@@ -37,6 +41,7 @@ enum class VaultNavTab {
 /**
  * Floating Rounded Bottom Dock matching screenshot:
  * White capsule surface with Home (Navy filled active pill) and Favorites (outline)
+ * Now with smooth animated color transitions between tab states.
  */
 @Composable
 fun BottomNavDock(
@@ -44,9 +49,7 @@ fun BottomNavDock(
     onSelectTab: (VaultNavTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = MaterialTheme.colorScheme.background.red < 0.2f
-    val dockBg = if (isDark) Color(0xFF213B50) else Color.White
-    val dockBorder = if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)
+    val vc = VaultTheme.colors
 
     Card(
         modifier = modifier
@@ -54,8 +57,8 @@ fun BottomNavDock(
             .padding(horizontal = 20.dp, vertical = 10.dp)
             .testTag("bottom_nav_dock"),
         shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(containerColor = dockBg),
-        border = BorderStroke(1.dp, dockBorder),
+        colors = CardDefaults.cardColors(containerColor = vc.dockBackground),
+        border = BorderStroke(1.dp, vc.dockBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -67,14 +70,21 @@ fun BottomNavDock(
         ) {
             // Home Tab
             val isHome = currentTab == VaultNavTab.HOME
+            val homeTabBg by animateColorAsState(
+                targetValue = if (isHome) vc.accentPrimary else Color.Transparent,
+                animationSpec = tween(300),
+                label = "home_tab_bg"
+            )
+            val homeTabContent by animateColorAsState(
+                targetValue = if (isHome) vc.accentOnPrimary else vc.mutedText,
+                animationSpec = tween(300),
+                label = "home_tab_content"
+            )
+
             Surface(
                 onClick = { onSelectTab(VaultNavTab.HOME) },
                 shape = RoundedCornerShape(20.dp),
-                color = if (isHome) {
-                    if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B)
-                } else {
-                    Color.Transparent
-                },
+                color = homeTabBg,
                 modifier = Modifier
                     .weight(1f)
                     .height(52.dp)
@@ -88,11 +98,7 @@ fun BottomNavDock(
                     Icon(
                         imageVector = Icons.Default.Home,
                         contentDescription = "Home",
-                        tint = if (isHome) {
-                            if (isDark) Color(0xFF172233) else Color.White
-                        } else {
-                            if (isDark) Color(0xFFC5CBD0) else Color(0xFF7A8B99)
-                        },
+                        tint = homeTabContent,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.height(2.dp))
@@ -100,25 +106,28 @@ fun BottomNavDock(
                         text = "Home",
                         fontSize = 11.sp,
                         fontWeight = if (isHome) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isHome) {
-                            if (isDark) Color(0xFF172233) else Color.White
-                        } else {
-                            if (isDark) Color(0xFFC5CBD0) else Color(0xFF7A8B99)
-                        }
+                        color = homeTabContent
                     )
                 }
             }
 
             // Favorites Tab
             val isFavorites = currentTab == VaultNavTab.FAVORITES
+            val favTabBg by animateColorAsState(
+                targetValue = if (isFavorites) vc.accentPrimary else Color.Transparent,
+                animationSpec = tween(300),
+                label = "fav_tab_bg"
+            )
+            val favTabContent by animateColorAsState(
+                targetValue = if (isFavorites) vc.accentOnPrimary else vc.mutedText,
+                animationSpec = tween(300),
+                label = "fav_tab_content"
+            )
+
             Surface(
                 onClick = { onSelectTab(VaultNavTab.FAVORITES) },
                 shape = RoundedCornerShape(20.dp),
-                color = if (isFavorites) {
-                    if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B)
-                } else {
-                    Color.Transparent
-                },
+                color = favTabBg,
                 modifier = Modifier
                     .weight(1f)
                     .height(52.dp)
@@ -132,11 +141,7 @@ fun BottomNavDock(
                     Icon(
                         imageVector = Icons.Outlined.BookmarkBorder,
                         contentDescription = "Favorites",
-                        tint = if (isFavorites) {
-                            if (isDark) Color(0xFF172233) else Color.White
-                        } else {
-                            if (isDark) Color(0xFFC5CBD0) else Color(0xFF7A8B99)
-                        },
+                        tint = favTabContent,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.height(2.dp))
@@ -144,11 +149,7 @@ fun BottomNavDock(
                         text = "Favorites",
                         fontSize = 11.sp,
                         fontWeight = if (isFavorites) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isFavorites) {
-                            if (isDark) Color(0xFF172233) else Color.White
-                        } else {
-                            if (isDark) Color(0xFFC5CBD0) else Color(0xFF7A8B99)
-                        }
+                        color = favTabContent
                     )
                 }
             }

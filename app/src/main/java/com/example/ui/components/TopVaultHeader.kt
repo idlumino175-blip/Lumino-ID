@@ -1,6 +1,5 @@
 package com.example.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.testTag
@@ -39,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.ClipEntity
+import com.example.ui.theme.VaultTheme
 
 @Composable
 fun TopVaultHeader(
@@ -52,7 +49,7 @@ fun TopVaultHeader(
     modifier: Modifier = Modifier
 ) {
     val totalCount = clips.size
-    val isDark = MaterialTheme.colorScheme.background.red < 0.2f
+    val vc = VaultTheme.colors
 
     val workCount = clips.count { it.tags.contains("Work", ignoreCase = true) }
     val personalCount = clips.count { it.tags.contains("Personal", ignoreCase = true) }
@@ -81,7 +78,7 @@ fun TopVaultHeader(
                 // Squircle App Icon with Folded Paper
                 Surface(
                     shape = RoundedCornerShape(13.dp),
-                    color = if (isDark) Color(0xFF213B50) else Color(0xFF1D4C6B),
+                    color = vc.accentPrimary,
                     modifier = Modifier.size(44.dp)
                 ) {
                     Box(
@@ -125,11 +122,11 @@ fun TopVaultHeader(
                 )
             }
 
-            // Dark Navy Plus (+) Button
+            // Add (+) Button
             Surface(
                 onClick = onAddNewClip,
                 shape = RoundedCornerShape(13.dp),
-                color = if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B),
+                color = vc.accentPrimary,
                 modifier = Modifier
                     .size(44.dp)
                     .testTag("top_add_clip_button")
@@ -138,7 +135,7 @@ fun TopVaultHeader(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add Clip",
-                        tint = if (isDark) Color(0xFF172233) else Color.White,
+                        tint = vc.accentOnPrimary,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -147,7 +144,7 @@ fun TopVaultHeader(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Search Bar Input (18dp corner radius, white background)
+        // Search Bar Input (18dp corner radius)
         OutlinedTextField(
             value = searchQuery,
             onValueChange = onSearchChange,
@@ -159,7 +156,7 @@ fun TopVaultHeader(
                 Text(
                     text = "Search by keyword or content...",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF7A8B99),
+                    color = vc.mutedText,
                     fontSize = 14.5.sp
                 )
             },
@@ -167,7 +164,7 @@ fun TopVaultHeader(
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search",
-                    tint = if (searchQuery.isNotEmpty()) (if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B)) else Color(0xFF7A8B99),
+                    tint = if (searchQuery.isNotEmpty()) vc.accentPrimary else vc.mutedText,
                     modifier = Modifier.size(20.dp)
                 )
             },
@@ -180,7 +177,7 @@ fun TopVaultHeader(
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear search",
-                            tint = Color(0xFF7A8B99),
+                            tint = vc.mutedText,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -192,10 +189,10 @@ fun TopVaultHeader(
                 imeAction = androidx.compose.ui.text.input.ImeAction.Search
             ),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = if (isDark) Color(0xFF213B50) else Color.White,
-                unfocusedContainerColor = if (isDark) Color(0xFF213B50) else Color.White,
-                focusedBorderColor = if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B),
-                unfocusedBorderColor = if (isDark) Color(0xFF385269) else Color(0xFFE5DFD4)
+                focusedContainerColor = vc.cardSurface,
+                unfocusedContainerColor = vc.cardSurface,
+                focusedBorderColor = vc.inputBorderFocused,
+                unfocusedBorderColor = vc.inputBorder
             )
         )
 
@@ -211,19 +208,9 @@ fun TopVaultHeader(
         ) {
             filterList.forEach { tab ->
                 val isSelected = selectedFilter.equals(tab.name, ignoreCase = true)
-                val isDarkNavy = isSelected
 
-                val bg = if (isDarkNavy) {
-                    if (isDark) Color(0xFFF7B98D) else Color(0xFF1D4C6B)
-                } else {
-                    if (isDark) Color(0xFF213B50) else Color(0xFFEEE9DF)
-                }
-
-                val textColor = if (isDarkNavy) {
-                    if (isDark) Color(0xFF172233) else Color.White
-                } else {
-                    if (isDark) Color(0xFFC5CBD0) else Color(0xFF42546A)
-                }
+                val bg = if (isSelected) vc.accentPrimary else vc.accentSecondary
+                val textColor = if (isSelected) vc.accentOnPrimary else vc.accentSecondaryText
 
                 Surface(
                     onClick = { onSelectFilter(tab.name) },
@@ -265,7 +252,7 @@ fun TopVaultHeader(
             Text(
                 text = "$filteredCount clips",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF7A8B99),
+                color = vc.mutedText,
                 fontSize = 13.sp
             )
         }
@@ -273,4 +260,3 @@ fun TopVaultHeader(
 }
 
 private data class FilterTab(val name: String, val count: Int)
-

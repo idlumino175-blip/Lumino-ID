@@ -27,49 +27,63 @@ enum class ClipCategory(
     val badgeLabel: String,
     val icon: ImageVector,
     val bgLight: Color,
-    val textLight: Color
+    val textLight: Color,
+    val bgDark: Color,
+    val textDark: Color
 ) {
     LINK(
         displayName = "Links",
         badgeLabel = "LINK",
         icon = Icons.Default.Link,
         bgLight = BadgeLinkBg,
-        textLight = BadgeLinkText
+        textLight = BadgeLinkText,
+        bgDark = Color(0xFF1E3D35),
+        textDark = Color(0xFFD7EFEB)
     ),
     CODE(
         displayName = "Code",
         badgeLabel = "CODE",
         icon = Icons.Default.Code,
         bgLight = BadgeCodeBg,
-        textLight = BadgeCodeText
+        textLight = BadgeCodeText,
+        bgDark = Color(0xFF332B4C),
+        textDark = Color(0xFFEDEAF8)
     ),
     OTP(
         displayName = "OTPs & Keys",
         badgeLabel = "OTP",
         icon = Icons.Default.Key,
         bgLight = BadgeOtpBg,
-        textLight = BadgeOtpText
+        textLight = BadgeOtpText,
+        bgDark = Color(0xFF473A16),
+        textDark = Color(0xFFFFF2CD)
     ),
     EMAIL(
         displayName = "Emails",
         badgeLabel = "EMAIL",
         icon = Icons.Default.Email,
         bgLight = BadgeEmailBg,
-        textLight = BadgeEmailText
+        textLight = BadgeEmailText,
+        bgDark = Color(0xFF4A3225),
+        textDark = Color(0xFFFDE9DC)
     ),
     NOTE(
         displayName = "Notes",
         badgeLabel = "NOTE",
         icon = Icons.Default.Notes,
         bgLight = BadgeNoteBg,
-        textLight = BadgeNoteText
+        textLight = BadgeNoteText,
+        bgDark = Color(0xFF4A3225),
+        textDark = Color(0xFFFDE9DC)
     ),
     TEXT(
         displayName = "General",
         badgeLabel = "TEXT",
         icon = Icons.Default.TextFields,
         bgLight = BadgeTextBg,
-        textLight = BadgeTextText
+        textLight = BadgeTextText,
+        bgDark = Color(0xFF283B4C),
+        textDark = Color(0xFFE4ECF4)
     );
 
     companion object {

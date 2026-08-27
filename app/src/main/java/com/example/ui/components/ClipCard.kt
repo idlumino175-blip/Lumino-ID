@@ -3,6 +3,7 @@ package com.example.ui.components
 import android.text.format.DateUtils
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.ClipCategory
 import com.example.model.ClipEntity
+import com.example.ui.theme.VaultTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -58,7 +60,8 @@ import kotlinx.coroutines.launch
  * Pastel ClipCard component matching user's exact specification:
  * - Category dot + uppercase type name
  * - Bookmark icon & 3-dot options menu
- * - Bold content text with 2-line preview
+ * - Title heading (when available)
+ * - Bold content text with 3-line preview
  * - Source & Relative date
  * - Dark Navy "Reuse" quick-copy button
  */
@@ -77,7 +80,8 @@ fun ClipCard(
     var isJustCopied by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val isDark = MaterialTheme.colorScheme.background.red < 0.2f
+    val isDarkTheme = isSystemInDarkTheme()
+    val vc = VaultTheme.colors
 
     val relativeTime = remember(clip.createdAt) {
         DateUtils.getRelativeTimeSpanString(
@@ -88,25 +92,9 @@ fun ClipCard(
         ).toString()
     }
 
-    val cardBg = when (clip.categoryEnum) {
-        ClipCategory.NOTE -> if (isDark) Color(0xFF4A3225) else Color(0xFFF8BA8E)
-        ClipCategory.LINK -> if (isDark) Color(0xFF1E3D35) else Color(0xFFC8DED5)
-        ClipCategory.CODE -> if (isDark) Color(0xFF332B4C) else Color(0xFFD9D5EA)
-        ClipCategory.OTP -> if (isDark) Color(0xFF473A16) else Color(0xFFF5DF9B)
-        ClipCategory.EMAIL -> if (isDark) Color(0xFF4A3225) else Color(0xFFF8BA8E)
-        ClipCategory.TEXT -> if (isDark) Color(0xFF283B4C) else Color(0xFFEEE9DF)
-    }
-
-    val inkColor = when (clip.categoryEnum) {
-        ClipCategory.NOTE -> if (isDark) Color(0xFFFDE9DC) else Color(0xFF4A3525)
-        ClipCategory.LINK -> if (isDark) Color(0xFFD7EFEB) else Color(0xFF164239)
-        ClipCategory.CODE -> if (isDark) Color(0xFFEDEAF8) else Color(0xFF362B57)
-        ClipCategory.OTP -> if (isDark) Color(0xFFFFF2CD) else Color(0xFF5E4B10)
-        ClipCategory.EMAIL -> if (isDark) Color(0xFFFDE9DC) else Color(0xFF4A3525)
-        ClipCategory.TEXT -> if (isDark) Color(0xFFE4ECF4) else Color(0xFF37475B)
-    }
-
-    val bodyTextColor = if (isDark) Color(0xFFF8F6F1) else Color(0xFF172233)
+    val cardBg = if (isDarkTheme) clip.categoryEnum.bgDark else clip.categoryEnum.bgLight
+    val inkColor = if (isDarkTheme) clip.categoryEnum.textDark else clip.categoryEnum.textLight
+    val bodyTextColor = vc.bodyText
 
     val subtitleText = remember(clip.source, relativeTime) {
         if (clip.source.isNotBlank()) {
@@ -169,7 +157,7 @@ fun ClipCard(
                         Icon(
                             imageVector = if (clip.isPinned) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                             contentDescription = if (clip.isPinned) "Favorited" else "Favorite",
-                            tint = if (clip.isPinned) Color(0xFFF5B700) else inkColor.copy(alpha = 0.75f),
+                            tint = if (clip.isPinned) vc.pinnedStar else inkColor.copy(alpha = 0.75f),
                             modifier = Modifier.size(19.dp)
                         )
                     }
@@ -262,9 +250,22 @@ fun ClipCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Body Content Snippet (concise single-line preview to keep cards clean and uniform)
+            // Title (shown when available)
+            if (clip.title.isNotBlank()) {
+                Text(
+                    text = clip.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = bodyTextColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            // Body Content Snippet (3-line preview preserving newlines)
             val displayPreview = remember(clip.content) {
-                clip.content.replace("\n", " ").trim()
+                clip.content.trim()
             }
 
             Text(
@@ -283,7 +284,7 @@ fun ClipCard(
                     )
                 },
                 color = bodyTextColor,
-                maxLines = 1,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -303,7 +304,7 @@ fun ClipCard(
                     modifier = Modifier.weight(1f, fill = false)
                 )
 
-                // Dark Navy "Reuse" Pill Button
+                // "Reuse" Pill Button
                 Surface(
                     onClick = {
                         onCopy()
@@ -314,7 +315,7 @@ fun ClipCard(
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
-                    color = if (isJustCopied) Color(0xFF143B33) else Color(0xFF1D4C6B),
+                    color = if (isJustCopied) vc.reuseBgCopied else vc.reuseBg,
                     modifier = Modifier
                         .height(30.dp)
                         .testTag("reuse_button_${clip.id}")
@@ -326,7 +327,7 @@ fun ClipCard(
                         Icon(
                             imageVector = if (isJustCopied) Icons.Default.Check else Icons.Default.ContentCopy,
                             contentDescription = "Reuse",
-                            tint = Color.White,
+                            tint = vc.reuseText,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(5.dp))
@@ -335,7 +336,7 @@ fun ClipCard(
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
-                            color = Color.White
+                            color = vc.reuseText
                         )
                     }
                 }
@@ -343,4 +344,3 @@ fun ClipCard(
         }
     }
 }
-
